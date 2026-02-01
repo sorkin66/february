@@ -34,23 +34,32 @@
       letter-spacing: 2px;
       color: #3a0f23;
       text-align: center;
-      margin: 0 0 16px 0;
+      margin: 0 0 10px 0;
       position: relative;
-      z-index: 3;
+      z-index: 4; /* text above the kiss overlay */
       text-shadow: 0 10px 22px rgba(0,0,0,0.12);
     }
-#kissGif {
-  display: none;
-  width: min(520px, 82vw);     /* never wider than 520px, but responsive */
-  max-height: 42vh;            /* prevents vertical overflow */
-  object-fit: contain;         /* keeps aspect ratio */
-  border-radius: 18px;
-  box-shadow: 0 14px 40px rgba(0,0,0,0.28);
-}
+
+    /* Kisses gif overlay for YAY (behind text) */
+    #yayKissGif {
+      display: none;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -62%);
+      width: min(520px, 82vw);
+      max-height: 42vh;
+      object-fit: contain;
+      opacity: 0.9;
+      z-index: 3;           /* behind #yayText, above background */
+      pointer-events: none; /* never blocks clicks */
+      filter: drop-shadow(0 14px 28px rgba(0,0,0,0.18));
+    }
+
     .buttons {
       position: relative;
       width: 100%;
-      height: 420px; /* taller: 3 gifs + a bigger kiss gif */
+      height: 420px;
       text-align: center;
       z-index: 2;
     }
@@ -84,7 +93,7 @@
       background-color: #6b6b6b;
       color: white;
       letter-spacing: 0.3px;
-      pointer-events: none;      /* non-clickable */
+      pointer-events: none;
       user-select: none;
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
       will-change: left, top;
@@ -102,47 +111,22 @@
       z-index: 2;
     }
 
-    /* GIF container */
-    #gifWrap {
-      margin-top: 18px;
+    /* Post-YES GIFs container (spread around page) */
+    #finalGifs {
+      position: fixed;
+      inset: 0;
       display: none;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 12px;
-      position: relative;
-      z-index: 2;
+      pointer-events: none;
+      z-index: 2; /* behind buttons/text, above background */
     }
 
-    /* Side-by-side GIF row */
-    #gifRow {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      padding: 0 14px;
-    }
-
-    #gifRow img {
-      width: min(240px, 26vw);
-      max-width: 280px;
+    .finalGif {
+      position: absolute;
+      width: min(220px, 28vw);
+      opacity: 0.95;
       border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-    }
-
-    /* Bigger kiss gif */
-    #kissGif {
-      display: none;
-      width: min(520px, 84vw);
-      border-radius: 18px;
-      box-shadow: 0 14px 40px rgba(0,0,0,0.28);
-    }
-
-    #gifCaption {
-      font-size: 14px;
-      color: #4a1d2f;
-      opacity: 0.9;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.24);
+      transform: rotate(0deg);
     }
 
     /* Default-mode question mark GIFs */
@@ -154,14 +138,13 @@
     }
 
     .qGif {
-  position: absolute;
-  width: min(200px, 26vw);    /* 👈 increased size */
-  opacity: 0.95;
-  border-radius: 14px;
-  box-shadow: 0 12px 28px rgba(0,0,0,0.22);
-  transform: rotate(0deg);
-}
-
+      position: absolute;
+      width: min(200px, 26vw);
+      opacity: 0.95;
+      border-radius: 14px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+      transform: rotate(0deg);
+    }
 
     /* T&C */
     .tnc {
@@ -182,7 +165,7 @@
       opacity: 0.9;
       animation: fall linear forwards;
       pointer-events: none;
-      z-index: 5;
+      z-index: 6;
     }
 
     @keyframes fall {
@@ -207,24 +190,22 @@
 
   <h1 id="mainTitle">Will you be my Valentine, Nidhi? ❤️</h1>
 
-  <!-- Big success text (hidden until final YES) -->
+  <!-- Kisses gif overlay for YAY (behind text) -->
+  <img id="yayKissGif" alt="Kisses" />
+
+  <!-- Big success text -->
   <div id="yayText">YAYYYYYYY</div>
+
+  <!-- Post-YES GIFs (spread around page like the question gifs) -->
+  <div id="finalGifs" aria-hidden="true">
+    <img class="finalGif" alt="Final GIF 1" />
+    <img class="finalGif" alt="Final GIF 2" />
+    <img class="finalGif" alt="Final GIF 3" />
+  </div>
 
   <div class="buttons">
     <button id="yesBtn">YES</button>
     <div id="stagePrompt"></div>
-
-    <div id="gifWrap">
-      <div id="gifRow">
-        <img class="gifImg" alt="Valentine GIF 1" />
-        <img class="gifImg" alt="Valentine GIF 2" />
-        <img class="gifImg" alt="Valentine GIF 3" />
-      </div>
-
-      <img id="kissGif" alt="Kisses GIF" />
-
-      <div id="gifCaption">Ok fine, you said yes 😌💖</div>
-    </div>
   </div>
 
   <button id="noBtn">no</button>
@@ -232,17 +213,17 @@
   <div class="tnc">* no is a bit shy</div>
 
   <script>
-    // ✅ Your 3 post-submit GIFs (side-by-side)
-    const gifUrls = [
+    // ✅ Post-YES GIFs (now spread around page)
+    const finalGifUrls = [
       "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHJ4MG91bTIzMWZib2RwZnR3ejJkY2xrOThydHE3bTFud2hqdmVtZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lxxOGaDRk4f7R5TkBd/giphy.gif",
       "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGp1ZTVjdXp4cHFxOWMwM3VwYWxkMGpzMnJza3ZrZ3FqdWZ3NXUzdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/cK3RF0ufQXi6WbO2IV/giphy.gif",
       "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExd24xeGFhdXY2amQ2N3dsMXFmbnAzNWliM3IzMnlxcTBvOWp6bmozbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9n0CvokbUMaWhFuCkp/giphy.gif"
     ];
 
-    // ✅ 4th bigger "kisses" gif (replace with your preferred one)
+    // ✅ Kisses gif overlay for the YAY
     const kissesGifUrl = "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ2J6dnoxOHBydmVyM3YwM2RrM2s3Y2QybnVhOTlubjYxa3FzbmcwcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MDJ9IbxxvDUQM/giphy.gif";
 
-    // ✅ Default-mode "question mark" vibes (removed after final YES)
+    // ✅ Default-mode "question mark" gifs (removed after final YES)
     const questionGifUrls = [
       "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExemRpYjV6ZWdtNzV5MDV1eWlhbW51dnVyaG4ydThsaTBsbmZ3ZGk0cSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/OnVGNHwl1FtIDTI7fJ/giphy.gif",
       "https://media.giphy.com/media/26ufdipQqU2lhNA4g/giphy.gif",
@@ -262,16 +243,18 @@
 
     const mainTitle = document.getElementById("mainTitle");
     const yayText = document.getElementById("yayText");
+    const yayKissGif = document.getElementById("yayKissGif");
 
     const yesBtn = document.getElementById("yesBtn");
     const stagePrompt = document.getElementById("stagePrompt");
-    const gifWrap = document.getElementById("gifWrap");
-    const gifImgs = Array.from(document.querySelectorAll(".gifImg"));
-    const kissGif = document.getElementById("kissGif");
 
     // Question GIF elements
     const qGifsWrap = document.getElementById("qGifs");
     const qGifImgs = Array.from(document.querySelectorAll("#qGifs .qGif"));
+
+    // Final GIF elements
+    const finalGifsWrap = document.getElementById("finalGifs");
+    const finalGifImgs = Array.from(document.querySelectorAll("#finalGifs .finalGif"));
 
     function placeQuestionGifs() {
       const positions = [
@@ -290,26 +273,38 @@
       });
     }
 
+    function placeFinalGifs() {
+      // Spread around the page, leaving center area for YAY + buttons
+      const positions = [
+        { left: 8,  top: 18, rot: -7 },
+        { left: 78, top: 22, rot: 6 },
+        { left: 12, top: 68, rot: 8 }
+      ];
+
+      finalGifImgs.forEach((img, i) => {
+        img.src = finalGifUrls[i % finalGifUrls.length];
+        img.style.left = positions[i].left + "vw";
+        img.style.top = positions[i].top + "vh";
+        img.style.transform = `rotate(${positions[i].rot}deg)`;
+      });
+    }
+
     placeQuestionGifs();
-    window.addEventListener("resize", placeQuestionGifs);
+    window.addEventListener("resize", () => {
+      placeQuestionGifs();
+      if (finalGifsWrap.style.display === "block") placeFinalGifs();
+    });
 
     function removeQuestionGifs() {
       if (qGifsWrap) qGifsWrap.remove();
     }
 
-    function showGifs(urls) {
-      gifImgs.forEach((img, idx) => {
-        if (urls[idx]) {
-          img.src = urls[idx];
-          img.style.display = "block";
-        } else {
-          img.style.display = "none";
-        }
-      });
-      gifWrap.style.display = "flex";
+    function showFinalGifs() {
+      placeFinalGifs();
+      finalGifsWrap.style.display = "block";
     }
 
-    // ---- Confetti: keep going for 20–30 seconds ----
+    // ---- Confetti: keep going for ~25 seconds ----
     let confettiTimer = null;
     let confettiStopper = null;
 
@@ -342,11 +337,10 @@
     }
 
     function startConfettiFor(ms) {
-      // keep creating bursts, then stop after ms
       if (confettiTimer) clearInterval(confettiTimer);
       if (confettiStopper) clearTimeout(confettiStopper);
 
-      burstConfetti(220); // big first hit
+      burstConfetti(240);
       confettiTimer = setInterval(() => burstConfetti(120), 650);
 
       confettiStopper = setTimeout(() => {
@@ -368,24 +362,21 @@
         return;
       }
 
-      // ✅ Final YES outcome:
-      // 1) remove the main title
-      // 2) show big YAYYYYYYY
-      // 3) remove question gifs
-      // 4) show 3 gifs + bigger kisses gif
-      // 5) confetti for ~25s (20–30 target)
+      // Final YES outcome
       mainTitle.style.display = "none";
       yayText.style.display = "block";
 
-      stagePrompt.textContent = ""; // optional: clean up prompt line
+      // Show kisses overlay behind text
+      yayKissGif.src = kissesGifUrl;
+      yayKissGif.style.display = "block";
+
+      stagePrompt.textContent = "";
       removeQuestionGifs();
 
-      showGifs(gifUrls);
+      // Show the 3 final gifs spread around the page
+      showFinalGifs();
 
-      kissGif.src = kissesGifUrl;
-      kissGif.style.display = "block";
-
-      startConfettiFor(25000); // 25 seconds (within your 20–30 window)
+      startConfettiFor(25000); // ~25 seconds
 
       yesBtn.disabled = true;
       yesBtn.style.cursor = "default";
