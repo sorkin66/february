@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Will You Be My Valentine?</title>
+
+  <style>
+    body {
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: "Arial", sans-serif;
+      background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 28px;
+      color: #3a0f23;
+      text-align: center;
+    }
+
+    .buttons {
+      position: relative;
+      width: 100%;
+      height: 320px; /* a bit taller to fit the GIF row */
+      text-align: center;
+    }
+
+    /* YES button */
+    #yesBtn {
+      font-size: 20px;
+      padding: 15px 40px;
+      border: none;
+      border-radius: 8px;
+      background-color: #ff3b6f;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+      transition: transform 0.2s ease;
+    }
+
+    #yesBtn:hover {
+      transform: scale(1.1);
+    }
+
+    /* NO button */
+    #noBtn {
+      position: fixed;
+  left: 56%;
+  top: 55%;
+  font-size: 13px;           /* slightly bigger */
+  padding: 8px 16px;         /* nicer padding */
+  border: none;
+  border-radius: 18px;       /* softer pill shape */
+  background-color: #6b6b6b; /* softer grey */
+  color: white;
+  letter-spacing: 0.3px;
+  pointer-events: none;      /* non-clickable */
+  user-select: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  will-change: left, top;
+    }
+
+    /* Stage prompt */
+    #stagePrompt {
+      margin-top: 16px;
+      font-size: 16px;
+      color: #4a1d2f;
+      opacity: 0.95;
+      min-height: 22px;
+    }
+
+    /* GIF container */
+    #gifWrap {
+      margin-top: 18px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Side-by-side GIF row */
+    #gifRow {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap; /* if 3 GIFs don't fit on smaller screens, it wraps */
+      justify-content: center;
+      align-items: center;
+      padding: 0 14px;
+    }
+
+    #gifRow img {
+      width: min(240px, 26vw);
+      max-width: 280px;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+
+    #gifCaption {
+      font-size: 14px;
+      color: #4a1d2f;
+      opacity: 0.9;
+    }
+
+    /* T&C */
+    .tnc {
+      position: absolute;
+      bottom: 15px;
+      font-size: 12px;
+      color: #4a1d2f;
+      opacity: 0.8;
+    }
+
+    /* Simple confetti pieces */
+    .confetti {
+      position: absolute;
+      top: -10px;
+      width: 10px;
+      height: 14px;
+      opacity: 0.9;
+      animation: fall linear forwards;
+      pointer-events: none;
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Will you be my Valentine, Nidhi? ❤️</h1>
+
+  <div class="buttons">
+    <button id="yesBtn">YES</button>
+    <div id="stagePrompt"></div>
+
+    <div id="gifWrap">
+      <div id="gifRow">
+        <img class="gifImg" alt="Valentine GIF 1" />
+        <img class="gifImg" alt="Valentine GIF 2" />
+        <img class="gifImg" alt="Valentine GIF 3" />
+      </div>
+      <div id="gifCaption">Ok fine, you said yes 😌💖</div>
+    </div>
+  </div>
+
+  <button id="noBtn">no</button>
+
+  <div class="tnc">* no is a bit shy</div>
+
+  <script>
+    // 👉 Replace these with your desired GIF links (2 or 3).
+    // If you want only 2, keep 2 URLs and the 3rd image will auto-hide.
+    const gifUrls = [
+      "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHJ4MG91bTIzMWZib2RwZnR3ejJkY2xrOThydHE3bTFud2hqdmVtZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lxxOGaDRk4f7R5TkBd/giphy.gif",
+      "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGp1ZTVjdXp4cHFxOWMwM3VwYWxkMGpzMnJza3ZrZ3FqdWZ3NXUzdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/cK3RF0ufQXi6WbO2IV/giphy.gif",
+      "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExd24xeGFhdXY2amQ2N3dsMXFmbnAzNWliM3IzMnlxcTBvOWp6bmozbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9n0CvokbUMaWhFuCkp/giphy.gif"
+    ];
+
+    // Multi-stage YES flow
+    const stages = [
+      { prompt: "Are you sure? 😏", yesText: "Yes" },
+      { prompt: "Like… REALLY sure? 🥺", yesText: "Yes, really" },
+      { prompt: "Last chance to back out 😌", yesText: "Okay YES" },
+      { prompt: "Locking it in… 💘", yesText: "YESSS!" }
+    ];
+    let stageIndex = 0;
+
+    const yesBtn = document.getElementById("yesBtn");
+    const stagePrompt = document.getElementById("stagePrompt");
+    const gifWrap = document.getElementById("gifWrap");
+    const gifImgs = Array.from(document.querySelectorAll(".gifImg"));
+
+    function burstConfetti(count = 180) {
+      const colors = ["#ff3b6f", "#ffffff", "#ffd1dc", "#b3003c", "#ffcc00", "#6a00ff", "#00c2ff"];
+      const durationMin = 1400;
+      const durationMax = 3200;
+
+      for (let i = 0; i < count; i++) {
+        const piece = document.createElement("div");
+        piece.className = "confetti";
+
+        const sizeW = 6 + Math.random() * 10;
+        const sizeH = 8 + Math.random() * 14;
+        piece.style.width = sizeW + "px";
+        piece.style.height = sizeH + "px";
+
+        piece.style.left = (Math.random() * 100) + "vw";
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+        const dur = durationMin + Math.random() * (durationMax - durationMin);
+        piece.style.animationDuration = dur + "ms";
+
+        const drift = (Math.random() * 2 - 1) * 140; // -140..140px
+        piece.style.transform = `translateX(${drift}px) rotate(${Math.random() * 360}deg)`;
+
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), dur + 200);
+      }
+    }
+
+    function showGifs(urls) {
+      // Fill images and hide unused ones
+      gifImgs.forEach((img, idx) => {
+        if (urls[idx]) {
+          img.src = urls[idx];
+          img.style.display = "block";
+        } else {
+          img.style.display = "none";
+        }
+      });
+      gifWrap.style.display = "flex";
+    }
+
+    yesBtn.addEventListener("click", () => {
+      // Advance stages
+      if (stageIndex < stages.length) {
+        stagePrompt.textContent = stages[stageIndex].prompt;
+        yesBtn.textContent = stages[stageIndex].yesText;
+
+        const grow = 1 + stageIndex * 0.08;
+        yesBtn.style.transform = `scale(${grow})`;
+
+        stageIndex++;
+        return;
+      }
+
+      // Final: show GIFs on page + confetti
+      stagePrompt.textContent = "YAYYYYY! 🎉💖";
+      showGifs(gifUrls);
+      burstConfetti(240);
+
+      yesBtn.disabled = true;
+      yesBtn.style.cursor = "default";
+      yesBtn.style.opacity = "0.9";
+    });
+
+    // --- NO button: runs away from cursor but NEVER leaves the screen ---
+    const noBtn = document.getElementById("noBtn");
+
+    let noX = window.innerWidth * 0.56;
+    let noY = window.innerHeight * 0.55;
+    noBtn.style.left = noX + "px";
+    noBtn.style.top = noY + "px";
+
+    function clamp(val, min, max) {
+      return Math.max(min, Math.min(max, val));
+    }
+
+    document.addEventListener("mousemove", (e) => {
+      const rect = noBtn.getBoundingClientRect();
+
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+
+      const dx = cx - e.clientX;
+      const dy = cy - e.clientY;
+      const dist = Math.hypot(dx, dy);
+
+      const trigger = 140;
+      if (dist < trigger) {
+        const nx = dx / (dist || 1);
+        const ny = dy / (dist || 1);
+
+        const speed = 10 + (trigger - dist) * 0.25;
+
+        noX = rect.left + nx * speed;
+        noY = rect.top + ny * speed;
+
+        const pad = 8;
+        const maxX = window.innerWidth - rect.width - pad;
+        const maxY = window.innerHeight - rect.height - pad;
+
+        noX = clamp(noX, pad, maxX);
+        noY = clamp(noY, pad, maxY);
+
+        noBtn.style.left = noX + "px";
+        noBtn.style.top = noY + "px";
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      const rect = noBtn.getBoundingClientRect();
+      const pad = 8;
+      const maxX = window.innerWidth - rect.width - pad;
+      const maxY = window.innerHeight - rect.height - pad;
+
+      const currentLeft = parseFloat(noBtn.style.left) || rect.left;
+      const currentTop = parseFloat(noBtn.style.top) || rect.top;
+
+      noX = clamp(currentLeft, pad, maxX);
+      noY = clamp(currentTop, pad, maxY);
+
+      noBtn.style.left = noX + "px";
+      noBtn.style.top = noY + "px";
+    });
+  </script>
+
+</body>
+</html>
