@@ -201,6 +201,9 @@
     <img class="finalGif" alt="Final GIF 1" />
     <img class="finalGif" alt="Final GIF 2" />
     <img class="finalGif" alt="Final GIF 3" />
+    <img class="finalGif" alt="Final GIF 4" />
+    <img class="finalGif" alt="Final GIF 5" />
+    <img class="finalGif" alt="Final GIF 6" />
   </div>
 
   <div class="buttons">
@@ -215,13 +218,16 @@
   <script>
     // ✅ Post-YES GIFs (now spread around page)
     const finalGifUrls = [
-      "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHJ4MG91bTIzMWZib2RwZnR3ejJkY2xrOThydHE3bTFud2hqdmVtZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/lxxOGaDRk4f7R5TkBd/giphy.gif",
-      "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGp1ZTVjdXp4cHFxOWMwM3VwYWxkMGpzMnJza3ZrZ3FqdWZ3NXUzdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/cK3RF0ufQXi6WbO2IV/giphy.gif",
-      "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExd24xeGFhdXY2amQ2N3dsMXFmbnAzNWliM3IzMnlxcTBvOWp6bmozbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9n0CvokbUMaWhFuCkp/giphy.gif"
+      "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWZ5ZnhmZnV2eDNoc2Z2YXFrcWl4NTA5azM3eWg1ZnFoa3NxcTh1MCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/WmkqburJqXziM/giphy.gif",
+      "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZWIxMTQ2MzV0M2xncnd6cmw5ZnFvNHBibDhheXp6Z3J0dWk4MGhubSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/nDMyoNRkCesJdZAuuL/giphy.gif",
+      "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnl0Y3BqeWp2ZzA4eXk1MWJsZWR3YzVmdGRwNzkzYWxmc2QybGJ0eiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/RLJxQtX8Hs7XytaoyX/giphy.gif",
+      "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDFnMnd3a2V4OTNod245c29mNTJodTF5dm54bXIwd2lscmJzZnd1eiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/L3kTwtVpbo8GURq71M/giphy.gif",
+      "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDFnMnd3a2V4OTNod245c29mNTJodTF5dm54bXIwd2lscmJzZnd1eiZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Jt4y4zi519V6asgGhA/giphy.gif"
     ];
 
     // ✅ Kisses gif overlay for the YAY
-    const kissesGifUrl = "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ2J6dnoxOHBydmVyM3YwM2RrM2s3Y2QybnVhOTlubjYxa3FzbmcwcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MDJ9IbxxvDUQM/giphy.gif";
+    const kissesGifUrl =
+      "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ2J6dnoxOHBydmVyM3YwM2RrM2s3Y2QybnVhOTlubjYxa3FzbmcwcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/MDJ9IbxxvDUQM/giphy.gif";
 
     // ✅ Default-mode "question mark" gifs (removed after final YES)
     const questionGifUrls = [
@@ -274,11 +280,14 @@
     }
 
     function placeFinalGifs() {
-      // Spread around the page, leaving center area for YAY + buttons
+      // Spread around the page, keep a clear-ish middle for YAY + buttons
       const positions = [
-        { left: 8,  top: 18, rot: -7 },
-        { left: 78, top: 22, rot: 6 },
-        { left: 12, top: 68, rot: 8 }
+        { left: 6,  top: 16, rot: -7 },
+        { left: 76, top: 18, rot: 6 },
+        { left: 10, top: 62, rot: 8 },
+        { left: 76, top: 64, rot: -6 },
+        { left: 28, top: 10, rot: 4 },
+        { left: 56, top: 72, rot: -4 }
       ];
 
       finalGifImgs.forEach((img, i) => {
@@ -290,6 +299,7 @@
     }
 
     placeQuestionGifs();
+
     window.addEventListener("resize", () => {
       placeQuestionGifs();
       if (finalGifsWrap.style.display === "block") placeFinalGifs();
@@ -373,7 +383,7 @@
       stagePrompt.textContent = "";
       removeQuestionGifs();
 
-      // Show the 3 final gifs spread around the page
+      // Show the final gifs spread around the page
       showFinalGifs();
 
       startConfettiFor(25000); // ~25 seconds
